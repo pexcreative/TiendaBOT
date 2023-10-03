@@ -25,6 +25,23 @@ $brand = isset($_REQUEST["BRAND"])? $_REQUEST["BRAND"] : '';
 //ELIMINAR LAS WIDGET
 $escapeIds = array("ITEM_CONDITION","MOBILE_NETWORK","WITH_FACIAL_RECOGNITION","WITH_FAST_CHARGING","WITH_FINGERPRINT_READER","WITH_GPS","WITH_GYROSCOPE", "WITH_MEMORY_CARD_SLOT","WITH_RADIO");
 
+$replaceIds = array(
+	array(
+		"TEXT_SEARCH" => "CELL_BATTERY_SHAPE",
+		"REPLACE_FOR" => "PRUEBA"
+	)
+);
+
+function getWord($word) {
+	$newValue = $word;
+	foreach($GLOBALS["replaceIds"] as $inf) {
+		if($inf["TEXT_SEARCH"] == $word) {
+			$newValue = $inf["REPLACE_FOR"];
+		}
+	}
+	return $newValue;
+}
+
 $url = "https://api.mercadolibre.com/sites/$mla/search?category=".$id_categoria."&limit=".$limit."&offset=".$offset."&sort=".$sort."";
 
 foreach($_REQUEST as $k => $req) {
@@ -194,7 +211,7 @@ $caterories = isset($info3->path_from_root)? $info3->path_from_root : '';
 						foreach($filtros as &$filter):
 							if(ctype_upper(implode("", explode("_", $filter->id))) && !in_array($filter->id, $escapeIds)):
 				?>
-								<h3 class="fs-5"><?php echo $filter->id; ?></h3>
+								<h3 class="fs-5"><?php echo getWord($filter->id); ?></h3>
 								<ul class="text-capitalize list-unstyled ps-2">
 				<?php
 								for($ind = 0; $ind < (count($filter->values) <= 10 ? count($filter->values) : 10); $ind++):
