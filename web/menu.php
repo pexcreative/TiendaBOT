@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-md sticky-top navbar-shrink py-2 navbar-light" id="mainNav">
 	<div class="container">
-		<a class="navbar-brand d-flex align-items-center" href="/"><img alt="EMPRESA" class="img-fluid" src="assets/img/logo.svg" width="162" height="49"></a>
+		<a class="navbar-brand d-flex align-items-center" href="/"><img alt="EMPRESA" class="img-fluid" src="/assets/img/logo.svg" width="162" height="49"></a>
 		<button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
 		<div class="collapse navbar-collapse" id="navcol-1">
 			<ul class="navbar-nav ms-auto">

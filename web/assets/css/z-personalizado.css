@@ -88,6 +88,10 @@ footer {
 .list-product-rel{
 	max-height:191px;
 }
+.img-producto{
+	max-height: 419px;
+    object-fit: contain;
+}
 
 .list-group-item:hover, .form-check:hover {
   background-color: #FFF8DF!important;

@@ -1,4 +1,15 @@
 <?php
+	session_start();
+	require_once 'classes/Password.php';
+	require_once 'classes/DatabasePDOInstance.function.php';
+	$db = DatabasePDOInstance();
+
+	$id_categoria = isset($_REQUEST["id"])? $_REQUEST["id"] : 'MLA1000';
+	$search = isset($_REQUEST["s"])? $_REQUEST["s"] : '';
+
+
+	$catInfo = db_select_row("categories", "*", "category = '$id_categoria'");
+	$searchInfo = db_select_row("keywords", "*", "keyword = '$search'");
 function curl($url) {
 	$ch = curl_init($url); // Inicia sesión cURL
 	curl_setopt($ch, CURLOPT_USERAGENT, 'Googlebot/2.1 (+http://www.google.com/bot.html)'); 
@@ -9,8 +20,28 @@ function curl($url) {
 	return $info; // Devuelve la información de la función
 }
 
+function stripStr($str) {
+	//$newStr = "";
+	$newStr = implode("|", explode('"', $str));
+	$newStr = implode("!", explode('(', $newStr));
+	$newStr = implode("$", explode(')', $newStr));
+	
+
+	return $newStr;
+}
+
+function stripStrDecode($str) {
+	//$newStr = "";
+	$newStr = implode('"', explode("|", $str));
+	$newStr = implode('(', explode("!", $newStr));
+	$newStr = implode(')', explode("$", $newStr));
+	
+
+	return $newStr;
+}
+
 //OBTENER ID DE CATEGORIA
-$id_categoria = isset($_REQUEST["id"])? $_REQUEST["id"] : '';
+
 $mla = $id_categoria != "" ? substr($id_categoria, 0, 3) : "MLA";
 $offset = isset($_REQUEST["offset"])? $_REQUEST["offset"] : '';
 $limit = isset($_REQUEST["limit"])? $_REQUEST["limit"] : '15';
@@ -23,14 +54,10 @@ $es_recargable = isset($_REQUEST["IS_RECHARGEABLE"])? $_REQUEST["IS_RECHARGEABLE
 $brand = isset($_REQUEST["BRAND"])? $_REQUEST["BRAND"] : '';
 
 //ELIMINAR LAS WIDGET
-$escapeIds = array("ITEM_CONDITION","MOBILE_NETWORK","WITH_FACIAL_RECOGNITION","WITH_FAST_CHARGING","WITH_FINGERPRINT_READER","WITH_GPS","WITH_GYROSCOPE", "WITH_MEMORY_CARD_SLOT","WITH_RADIO");
+$escapeIds = array("ITEM_CONDITION","MOBILE_NETWORK","WITH_FACIAL_RECOGNITION","WITH_FAST_CHARGING","WITH_FINGERPRINT_READER","WITH_GPS","WITH_GYROSCOPE", "WITH_MEMORY_CARD_SLOT","WITH_RADIO","DISPLAY_TYPE","IS_DUST_RESISTANT","IS_WATERPROOF","IS_PORTABLE","WITH_SCREEN_SHARE_FUNCTION");
 
-$replaceIds = array(
-	array(
-		"TEXT_SEARCH" => "CELL_BATTERY_SHAPE",
-		"REPLACE_FOR" => "PRUEBA"
-	)
-);
+//TRADUCCION DE WIDGET
+include_once('traduccion.php');
 
 function getWord($word) {
 	$newValue = $word;
@@ -42,36 +69,38 @@ function getWord($word) {
 	return $newValue;
 }
 
-$url = "https://api.mercadolibre.com/sites/$mla/search?category=".$id_categoria."&limit=".$limit."&offset=".$offset."&sort=".$sort."";
+$url = "https://api.mercadolibre.com/sites/$mla/search?category=".$id_categoria."&limit=".$limit."&offset=".$offset."&sort=".$sort."&condition=new";
+
+//SI NO HAY CATEGORIA PERO HAY KEYWORD ENTONCES CAMBIAR URL
+if($search != ''){
+	$search = urlencode($search);
+	$url = "https://api.mercadolibre.com/sites/$mla/search?q=$search&limit=".$limit."&offset=".$offset."&sort=".$sort."&condition=new";
+}
 
 foreach($_REQUEST as $k => $req) {
 	if(substr($k, 0, 2) == "__") {
-		$url .= "&" . implode("", explode("__", $k)) . "=" . $req;
+		$url .= "&" . implode("", explode("__", $k)) . "=" . stripStrDecode($req);
 	}
 }
+//echo $url; die();
+
+
 
 //CONSULTANDO PRODUCTOS DE UNA CATEGORIA
-
-/*if($brand){
-	$url = $url."&BRAND=".$brand;
-}
-if($forma_bateria){
-	$url = $url."&CELL_BATTERY_SHAPE=".$forma_bateria;
-}
-if($tamano_bateria){
-	$url = $url."&CELL_BATTERY_SIZE=".$tamano_bateria;
-}
-if($es_recargable){
-	$url = $url."&IS_RECHARGEABLE=".$es_recargable;
-}*/
-
 //echo $url;
 $sitioweb = curl($url);
 $info = json_decode($sitioweb);
 $paginas = isset($info->paging->total)? $info->paging->total : '';
-$catego = isset($info->filters[0]->values[0]->name)? $info->filters[0]->values[0]->name : 'Por favor ingresa una catoría';
+$catego = isset($info->filters[0]->values[0]->name)? $info->filters[0]->values[0]->name : '';
+
 //PRODUCTOS
 $results = isset($info->results)? $info->results : '';
+if(!isset($info->results)) {
+	header('Location: categoria.php');
+}
+if(count($info->results) == 0) {
+	header('Location: categoria.php');
+}
 // FILTROS
 // print_r ($info->available_filters);
 $filtro_marcas = isset($info->available_filters[13]->values)? $info->available_filters[13]->values : '';
@@ -91,6 +120,31 @@ $url3 = "https://api.mercadolibre.com/categories/".$id_categoria;
 $categorias = curl($url3);
 $info3 = json_decode($categorias);
 $caterories = isset($info3->path_from_root)? $info3->path_from_root : '';
+$children_categories = isset($info3->children_categories)? $info3->children_categories : '';
+
+
+	$filterRemoveWords = array("https://eshops.mercadolibre.com.ar");
+	$desc = "";
+	if($catInfo) {
+		if($catInfo["title"] && $catInfo["title"] != "") {
+			$catego = $catInfo["title"];
+		}
+		if($catInfo["description"] && $catInfo["description"] != "") {
+			$desc = $catInfo["description"];
+		}
+	}
+	foreach($filterRemoveWords as $word) {
+		$desc = implode("", explode($word, $desc));
+	}
+
+	if($search != ''){
+		$catego = urldecode($search);
+	}
+	if($searchInfo) {
+		if($searchInfo["title"] && $searchInfo["title"] != "") {
+			$catego = $searchInfo["title"];
+		}
+	}
 
 ?>
 <!DOCTYPE html>
@@ -125,8 +179,19 @@ $caterories = isset($info3->path_from_root)? $info3->path_from_root : '';
 			<?php }?>
             <div class="row">
                 <div class="col-12">
-                    <h1 class="text-capitalize fs-3"><?php echo $catego;?></h1>
-                    <p>Lorem Ipsum es simplemente el texto de relleno de las imprentas y archivos de texto. Lorem Ipsum ha sido el texto de relleno estándar de las industrias desde el año 1500, cuando un impresor (N. del T. persona que se dedica a la imprenta) desconocido usó una galería de textos y los mezcló de tal manera que logró hacer un libro de textos especimen.</p>
+                    <h1 class="text-capitalize fs-3">
+						<span class="titleLabel"><?php echo $catego;?></span>
+						<?php if(isset($_SESSION["P3xN3w"])): ?>
+							<a href="javascript: void(0);" data-bs-toggle="modal" data-bs-target="#mdEdit">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+								<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+								<path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+							</svg>
+							</a>
+						<?php endif ?>
+					</h1>
+                    <p class="descLabel mb-0"><?php echo $desc; ?></p>
+					<div class="google-sidebar text-center">PUBLICIDAD</div>
                 </div>
 				<?php
 					$actual_link = "https://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
@@ -149,7 +214,7 @@ $caterories = isset($info3->path_from_root)? $info3->path_from_root : '';
             <div class="row">
                 <div class="col-md-9">
                     <div class="row list-group">
-					<?php 
+					<?php
 						foreach ($results as &$producto) {
 							$id = $producto->id;
 							$title = $producto->title;
@@ -159,13 +224,15 @@ $caterories = isset($info3->path_from_root)? $info3->path_from_root : '';
 							$sitioweb = curl($url);
 							$info = json_decode($sitioweb);
 							$imagen_principal = isset($info->pictures[0]->secure_url)? $info->pictures[0]->secure_url : 'assets/img/sin-imagen.png';
+							$condition = isset($info->condition)? $info->condition : '';
 							?>
-							<div class="col-12 p-0 list-group-item rounded" onclick="location.href = &#39;item.php?id=<?php echo $id;?>&#39;">
+							<?php if($condition == 'new'){?>
+							<div class="col-12 p-0 list-group-item rounded" onclick="location.href = &#39;/item.php?id=<?php echo $id;?>&#39;">
                             <div class="text-center p-2">
                                 <div class="row">
-                                    <div class="col-md-3"><a class="list-product" href="item.php?id=<?php echo $id;?>"><img data-bss-hover-animate="tada" class="producto list-product rounded" src="<?php echo $imagen_principal ;?>" alt="<?php echo $title;?>" height="160" width="160"></a></div>
+                                    <div class="col-md-3"><a class="list-product" href="/item.php?id=<?php echo $id;?>"><img data-bss-hover-animate="tada" class="producto list-product rounded" src="<?php echo $imagen_principal ;?>" alt="<?php echo $title;?>" height="160" width="160"></a></div>
                                     <div class="col text-start pt-3">
-										<a href="item.php?id=<?php echo $id;?>"><h2 class="text-capitalize fs-5 text-primary"><?php echo $title;?></h2></a>
+										<a href="/item.php?id=<?php echo $id;?>"><h2 class="text-capitalize fs-5 text-primary"><?php echo $title;?></h2></a>
                                         <p class="fs-5 sombra mb-0">$<?php echo number_format($price,0,",",".");?></p>
                                         
 										<?php if($price >= 250000){?>
@@ -180,6 +247,7 @@ $caterories = isset($info3->path_from_root)? $info3->path_from_root : '';
                                 </div>
                             </div>
                         </div>
+							<?php }?>
 						<?php }?>
                     </div>
 					<?php if($paginas >= 50){?>
@@ -197,26 +265,27 @@ $caterories = isset($info3->path_from_root)? $info3->path_from_root : '';
                 </div>
 				<!-- SIDEBAR -->
                 <div class="col-md-3">
-
-					
-
-                    <h3 class="fs-2">Categorias</h3>
-                    <ul class="text-capitalize list-unstyled ps-2">
-						<?php foreach ($caterories as &$categoria) {
-							echo '<li><a href="/categoria.php?id='.$categoria->id.'" class="text-black">'.$categoria->name.'</a></li>';
+					<?php if($children_categories && $search == ''){?>
+                    <h3 class="fs-5 p-2 bg-warning bg-gradient text-dark rounded mb-1">Categorias</h3>
+                    <ul class="text-capitalize list-unstyled ps-2 list-group mb-2">
+						<?php foreach ($children_categories as &$children) {
+							echo '<li><a href="/categoria.php?id='.$children->id.'" class="list-group-item text-black">'.$children->name.'</a></li>';
 						}?>
                     </ul>
+					<?php }?>
+					
+					<div class="mb-3 p-2 google-sidebar">PUBLICIDAD</div>
 					
 					<?php
-						foreach($filtros as &$filter):
+						foreach($filtros as &$filter): 
 							if(ctype_upper(implode("", explode("_", $filter->id))) && !in_array($filter->id, $escapeIds)):
 				?>
-								<h3 class="fs-5"><?php echo getWord($filter->id); ?></h3>
-								<ul class="text-capitalize list-unstyled ps-2">
+								<h3 class="fs-5 p-2 bg-warning bg-gradient text-dark rounded mb-1 <?php echo $filter->id; ?>"><?php echo getWord($filter->name); ?></h3>
+								<ul class="text-capitalize list-unstyled ps-2 list-group mb-2">
 				<?php
 								for($ind = 0; $ind < (count($filter->values) <= 10 ? count($filter->values) : 10); $ind++):
 				?>
-								<li><a href="/categoria.php?id=<?php echo $id_categoria; ?>&__<?php echo $filter->id; ?>=<?php echo $filter->values[$ind]->id; ?>" class="text-black"><?php echo $filter->values[$ind]->name." (".$filter->values[$ind]->results.")"; ?> </a></li>
+								<li><a href="<?php echo $actual_link;?>&__<?php echo $filter->id; ?>=<?php echo stripStr($filter->values[$ind]->id); ?>" class="list-group-item text-black"> <?php echo $filter->values[$ind]->name." <span class='d-none'>(".$filter->values[$ind]->results.")</span>"; ?> </a></li>
 				<?php
 								endfor;
 				?>
@@ -230,5 +299,77 @@ $caterories = isset($info3->path_from_root)? $info3->path_from_root : '';
             </div>
         </div>
     </section>
+	<div class="modal" tabindex="-1" id="mdEdit">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Modificar propiedades</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="mb-3">
+					<label for="titleForm" class="form-label">Titulo</label>
+					<input type="text" class="form-control" id="titleForm" placeholder="<?php echo $catego; ?>" value="<?php echo $catego; ?>">
+				</div>
+				<?php if($search == ""): ?>
+				<div class="mb-3">
+					<label for="descForm" class="form-label">Descripcion</label>
+					<textarea class="form-control" id="descForm" rows="8" placeholder="<?php echo $desc; ?>"><?php echo $desc; ?></textarea>
+				</div>
+			<?php endif ?>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary closeModal" data-bs-dismiss="modal">Cerrar</button>
+				<button type="button" class="btn btn-primary" id="saveInfo" onclick="saveInfo(this);" data-s="<?php echo $search != "" ? 1 : 0; ?>">Guardar</button>
+			</div>
+			</div>
+		</div>
+	</div>
+
+	<script src="https://cdn.tiny.cloud/1/0s8ums4s36gtz5ul5itstat94ff8x8t891d2zpyuu8vq1js1/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+
+	<script>
+
+	tinymce.init({
+		selector: '#descForm',
+		height: 300,
+		menubar: false,
+		plugins: [
+			'advlist autolink lists link image charmap print preview anchor',
+			'searchreplace visualblocks code fullscreen',
+			'insertdatetime media table paste code help wordcount'
+		],
+		toolbar: 'undo redo code | formatselect | ' +
+		'bold italic backcolor | alignleft aligncenter ' +
+		'alignright alignjustify | bullist numlist outdent indent | ' +
+		'removeformat | help',
+		content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+	});
+
+	var idp = "<?php echo $id_categoria; ?>";
+	var search = "<?php echo $search; ?>";
+	function saveInfo(el) {
+		$("#saveInfo").attr("disabled", true);
+		$("#saveInfo").addClass("disabled");
+		$.ajax({
+			type: 'POST',
+			url: 'server/',
+			data: 'o=3&t='+$("#titleForm").val()+'&d='+$("#descForm").val()+'&i='+(search != "" ? search : idp)+'&s=' + $(el).attr("data-s"),
+			dataType: 'json',
+			success: function(data) {
+				var title = $("#titleForm").val();
+				var desc = $("#descForm").val();
+				$(".titleLabel").html(title);
+				$(".descLabel").html(desc);
+				$("#saveInfo").attr("disabled", false);
+				$("#saveInfo").removeClass("disabled");
+				$(".closeModal").trigger("click");
+				$("#titleForm").val(title).attr("placeholder", title);
+				$("#descForm").val(desc).attr("placeholder", desc);
+			}
+		});
+	}
+    
+</script>
 	
 <?php include_once'footer.php';?>

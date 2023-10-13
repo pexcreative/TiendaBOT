@@ -7,17 +7,19 @@
         </div>
     </footer>
 	
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" async></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js" async></script>
-    <script src="assets/js/bs-init.js" async></script>
-    <script src="assets/js/bold-and-bright.js" async></script>
-	<script src="assets/js/lightbox-plus-jquery.min.js" async></script>
-	<script src='https://app.pexsell.com/js/486fe5ffbd1f01ba5d424c22be70ea3d.js' async></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script src="/assets/js/bs-init.js"></script>
+    <script src="/assets/js/bold-and-bright.js"></script>
+	<script src="/assets/js/lightbox-plus-jquery.min.js"></script>
+	<script src='https://app.pexsell.com/js/486fe5ffbd1f01ba5d424c22be70ea3d.js'></script>
 	<script>
-		lightbox.option({
-		  'resizeDuration': 200,
-		  'wrapAround': true
-		})
+		window.onload = function() {
+			lightbox.option({
+			'resizeDuration': 200,
+			'wrapAround': true
+			})
+		}
 	</script>
 	
 </body>

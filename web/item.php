@@ -1,4 +1,13 @@
 <?php
+	session_start();
+	require_once 'classes/Password.php';
+	require_once 'classes/DatabasePDOInstance.function.php';
+	$db = DatabasePDOInstance();
+
+	$id_producto = isset($_REQUEST["id"])? $_REQUEST["id"] : 'MLA1114967856';
+
+	$itemInfo = db_select_row("items", "*", "product = '$id_producto'");
+
 function curl($url) {
 	$ch = curl_init($url); // Inicia sesión cURL
 	curl_setopt($ch, CURLOPT_USERAGENT, 'Googlebot/2.1 (+http://www.google.com/bot.html)'); 
@@ -26,7 +35,8 @@ function convertirImagenABase64($src) {
 
 
 //OBTENER ID PRODUCTO
-$id_producto = isset($_REQUEST["id"])? $_REQUEST["id"] : 'MLA1114967856';
+
+$mla = $id_producto != "" ? substr($id_producto, 0, 3) : "MLA";
 
 //CONSULTANDO DATOS DEL ITEM
 $url = "https://api.mercadolibre.com/items/".$id_producto;
@@ -55,7 +65,8 @@ $url2 = "https://api.mercadolibre.com/items/".$id_producto."/description";
 $descripcion = curl($url2);
 $info2 = json_decode($descripcion);
 $descripcion = isset($info2->plain_text)? $info2->plain_text : '';
-$descripcion_google = $descripcion;
+$descripcion_google = preg_replace("/[\r\n|\n|\r]+/", " ", $descripcion);
+$descripcion_google = substr($descripcion_google, 0, 200);
 $descripcion = nl2br($descripcion);
 $descripcion = @str_replace($buscar, "", $descripcion);
 
@@ -66,10 +77,81 @@ $info3 = json_decode($categorias);
 $caterories = isset($info3->path_from_root)? $info3->path_from_root : '';
 
 //OBTENER ALTERNATIVAS DEL PRODUCTO
-$url4 = 'https://api.mercadolibre.com/sites/MLA/search?q='.urlencode($titulo).'&limit=4&offset=2';
+$url4 = 'https://api.mercadolibre.com/sites/'.$mla.'/search?q='.urlencode($titulo).'&limit=4&offset=2';
 $alternativas = curl($url4);
 $info4 = json_decode($alternativas);
 $alternativas = isset($info4->results)? $info4->results : '';
+
+	$filterRemoveWords = array("https://eshops.mercadolibre.com.ar");
+	if($itemInfo) {
+		if($itemInfo["title"] && $itemInfo["title"] != "") {
+			$titulo = $itemInfo["title"];
+		}
+		if($itemInfo["price"] && $itemInfo["price"] != "") {
+			$precio = $itemInfo["price"];
+		}
+		if($itemInfo["description"] && $itemInfo["description"] != "") {
+			$descripcion = $itemInfo["description"];
+		}
+	}
+	foreach($filterRemoveWords as $word) {
+		$descripcion = implode("", explode($word, $descripcion));
+	}
+
+	require_once "convertImageTmp.php";
+
+	$newPic = descargarYGuardarImagen($imagen_principal);
+	if ($newPic !== false) {
+		$imagen_principal = $newPic;
+	}
+	if($imagen2) {
+		$newPic = descargarYGuardarImagen($imagen2);
+		if ($newPic !== false) {
+			$imagen2 = $newPic;
+		}
+	}
+	if($imagen3) {
+		$newPic = descargarYGuardarImagen($imagen3);
+		if ($newPic !== false) {
+			$imagen3 = $newPic;
+		}
+	}
+	if($imagen4) {
+		$newPic = descargarYGuardarImagen($imagen4);
+		if ($newPic !== false) {
+			$imagen4 = $newPic;
+		}
+	}
+	if($imagen5) {
+		$newPic = descargarYGuardarImagen($imagen5);
+		if ($newPic !== false) {
+			$imagen5 = $newPic;
+		}
+	}
+	if($imagen6) {
+		$newPic = descargarYGuardarImagen($imagen6);
+		if ($newPic !== false) {
+			$imagen6 = $newPic;
+		}
+	}
+	if($imagen7) {
+		$newPic = descargarYGuardarImagen($imagen7);
+		if ($newPic !== false) {
+			$imagen7 = $newPic;
+		}
+	}
+	if($imagen8) {
+		$newPic = descargarYGuardarImagen($imagen8);
+		if ($newPic !== false) {
+			$imagen8 = $newPic;
+		}
+	}
+	if($imagen9) {
+		$newPic = descargarYGuardarImagen($imagen9);
+		if ($newPic !== false) {
+			$image9 = $newPic;
+		}
+	}
 
 ?>
 <!DOCTYPE html>
@@ -98,12 +180,12 @@ $alternativas = isset($info4->results)? $info4->results : '';
 						echo '<li class="breadcrumb-item"><a href="/categoria.php?id='.$categoria->id.'"><span>'.$categoria->name.'</span></a></li>';
 					}
 				?>
-                <li class="breadcrumb-item active"><span><?php echo $titulo;?></span></li>
+                <li class="breadcrumb-item active"><span class="titleLabel"><?php echo $titulo;?></span></li>
             </ol>
             <div class="row mb-3">
                 <div class="col-md-6 text-center">
                     <div class="bg-white rounded border mb-3">
-						<a href="<?php echo change_image_extension($imagen_principal);?>" data-lightbox="producto" data-title="<?php echo $titulo;?>"><img alt="<?php echo $titulo;?>" class="img-fluid rounded" data-bss-hover-animate="tada" src="<?php echo change_image_extension($imagen_principal);?>" width="350" height="350"></a>
+						<a href="<?php echo change_image_extension($imagen_principal);?>" data-lightbox="producto" data-title="<?php echo $titulo;?>"><img alt="<?php echo $titulo;?>" class="img-fluid rounded img-producto" data-bss-hover-animate="tada" src="<?php echo change_image_extension($imagen_principal);?>" width="350" height="350"></a>
                         
 						<?php if($imagen2){?>
 						<hr class="m-0">
@@ -159,11 +241,23 @@ $alternativas = isset($info4->results)? $info4->results : '';
                         </div>
 						<?php }?>
                     </div>
+					<div class="mb-3 p-2 google-product">PUBLICIDAD</div>
                 </div>
                 <div class="col-md-6">
                     <div>
-                        <h1 class="fs-3 fw-light text-center titulo"><?php echo $titulo;?></h1>
-                        <h2 class="fw-semibold text-center text-black sombra-2">$<?php echo number_format($precio,0,",",".");?> <?php echo $currency_id;?></h2>
+                        <h1 class="fs-3 fw-light text-center titulo"><span class="titleLabel"><?php echo $titulo; ?></span>
+					
+						<?php if(isset($_SESSION["P3xN3w"])): ?>
+							<a href="javascript: void(0);" data-bs-toggle="modal" data-bs-target="#mdEdit">
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+								<path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+								<path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+							</svg>
+							</a>
+						<?php endif ?>
+						
+						</h1>
+                        <h2 class="fw-semibold text-center text-black sombra-2 priceLabel">$<?php echo number_format($precio,0,",",".");?> <?php echo $currency_id;?></h2>
                         <div class="d-flex justify-content-center d-none" data-aos="zoom-in" data-aos-duration="1500" data-aos-delay="350">
 							<select class="form-select form-select-sm w-50 my-2 rounded">
 								<optgroup label="Cantidad">
@@ -175,7 +269,7 @@ $alternativas = isset($info4->results)? $info4->results : '';
                                 </optgroup>
 							</select>
 						</div>
-                        <div class="d-flex justify-content-center my-3" data-aos="zoom-in" data-aos-duration="1500" data-aos-delay="350">
+                        <div class="d-flex justify-content-center my-3">
 							<div class="btn-group botones" role="group">
 								<a class="btn btn-primary rounded me-2" role="button" href="comprar.php?sku=<?php echo base64_encode($id_producto);?>">COMPRAR</a>
 								<a class="btn btn-primary rounded" role="button" href="consultar.php?sku=<?php echo base64_encode($id_producto);?>">CONSULTAR</a>
@@ -183,7 +277,7 @@ $alternativas = isset($info4->results)? $info4->results : '';
                         </div>
 						
                         <div class="contenido p-2">
-							<div class="mb-3"><?php echo $descripcion;?></div>
+							<div class="mb-3 descLabel"><?php echo $descripcion;?></div>
 						</div>
 						
                         <div class="text-end"><a class="badge bg-danger text-uppercase opacity-75 btn-denuncia rounded" href="denuncia.php?sku=<?php echo base64_encode($id_producto);?>">Denunciar</a></div>
@@ -206,6 +300,12 @@ $alternativas = isset($info4->results)? $info4->results : '';
 							$sitioweb = curl($url);
 							$info = json_decode($sitioweb);
 							$imagen_principal = isset($info->pictures[0]->secure_url)? $info->pictures[0]->secure_url : 'assets/img/sin-imagen.png';
+							
+							$newPic = descargarYGuardarImagen($imagen_principal);
+							if ($newPic !== false) {
+								$imagen_principal = $newPic;
+							}
+							
 							//Solo muestra los item nuevos
 							$condicion = isset($alternativa->condition)? $alternativa->condition : '';
 						if($condicion == 'new'){
@@ -222,5 +322,63 @@ $alternativas = isset($info4->results)? $info4->results : '';
             </div>
         </div>
     </section>
+
+	<div class="modal" tabindex="-1" id="mdEdit">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Modificar propiedades</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="mb-3">
+					<label for="titleForm" class="form-label">Titulo</label>
+					<input type="text" class="form-control" id="titleForm" placeholder="<?php echo $titulo; ?>" value="<?php echo $titulo; ?>">
+				</div>
+				<div class="mb-3">
+					<label for="priceForm" class="form-label">Precio</label>
+					<input type="number" class="form-control" id="priceForm" placeholder="<?php echo $precio; ?>" value="<?php echo $precio; ?>">
+				</div>
+				<div class="mb-3">
+					<label for="descForm" class="form-label">Descripcion</label>
+					<textarea class="form-control" id="descForm" rows="15" placeholder="<?php echo $descripcion; ?>"><?php echo $descripcion; ?></textarea>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary closeModal" data-bs-dismiss="modal">Cerrar</button>
+				<button type="button" class="btn btn-primary" id="saveInfo" onclick="saveInfo();">Guardar</button>
+			</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+	var idp = "<?php echo $id_producto; ?>";
+	function saveInfo() {
+		$("#saveInfo").attr("disabled", true);
+		$("#saveInfo").addClass("disabled");
+		$.ajax({
+			type: 'POST',
+			url: 'server/',
+			data: 'o=2&t='+$("#titleForm").val()+'&p='+$("#priceForm").val()+'&d='+$("#descForm").val()+'&i='+idp,
+			dataType: 'json',
+			success: function(data) {
+				var title = $("#titleForm").val();
+				var price = $("#priceForm").val();
+				var desc = $("#descForm").val();
+				$(".titleLabel").html(title);
+				$(".priceLabel").html("$" + price);
+				$(".descLabel").html(desc);
+				$("#saveInfo").attr("disabled", false);
+				$("#saveInfo").removeClass("disabled");
+				$(".closeModal").trigger("click");
+				$("#titleForm").val(title).attr("placeholder", title);
+				$("#priceForm").val(price).attr("placeholder", price);
+				$("#descForm").val(desc).attr("placeholder", desc);
+			}
+		});
+	}
+    
+</script>
 	
 <?php include_once'footer.php';?>
