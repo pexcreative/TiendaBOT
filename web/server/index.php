@@ -19,6 +19,7 @@
     define("INGRESAR", 1);
     define("EDITAR_ITEM", 2);
     define("EDITAR_CAT", 3);
+    define("LOGOUT", 4);
 
     $key = "P3xN3w";
 
@@ -54,20 +55,43 @@
             echo json_encode(array("msg" => "OK"));
         break;
         case EDITAR_CAT:
-            $info = db_select_row("categories", "*", "category = '$_REQUEST[i]'");
-            if($info) {
-                db_update("categories", array(
-                    "title" => isset($_REQUEST["t"]) && $_REQUEST["t"] != "" ? $_REQUEST["t"] : null,
-                    "description" => isset($_REQUEST["d"]) && $_REQUEST["d"] != "" ? $_REQUEST["d"] : null
-                ), "category = '".$_REQUEST["i"]."'");
+            if($_REQUEST["s"] > 0) {
+                $info = db_select_row("keywords", "*", "keyword = '$_REQUEST[i]'");
+                if($info) {
+                    db_update("keywords", array(
+                        "title" => isset($_REQUEST["t"]) && $_REQUEST["t"] != "" ? $_REQUEST["t"] : null,
+                        "description" => isset($_REQUEST["d"]) && $_REQUEST["d"] != "" ? $_REQUEST["d"] : null,
+                    ), "keyword = '".$_REQUEST["i"]."'");
+                }
+                else {
+                    db_insert("keywords", array(
+                        "title" => isset($_REQUEST["t"]) && $_REQUEST["t"] != "" ? $_REQUEST["t"] : null,
+                        "description" => isset($_REQUEST["d"]) && $_REQUEST["d"] != "" ? $_REQUEST["d"] : null,
+                        "keyword" => isset($_REQUEST["i"]) && $_REQUEST["i"] != "" ? $_REQUEST["i"] : null
+                    ));
+                }
             }
             else {
-                db_insert("categories", array(
-                    "title" => isset($_REQUEST["t"]) && $_REQUEST["t"] != "" ? $_REQUEST["t"] : null,
-                    "description" => isset($_REQUEST["d"]) && $_REQUEST["d"] != "" ? $_REQUEST["d"] : null,
-                    "category" => $_REQUEST["i"]
-                ));
+                $info = db_select_row("categories", "*", "category = '$_REQUEST[i]'");
+                if($info) {
+                    db_update("categories", array(
+                        "title" => isset($_REQUEST["t"]) && $_REQUEST["t"] != "" ? $_REQUEST["t"] : null,
+                        "description" => isset($_REQUEST["d"]) && $_REQUEST["d"] != "" ? $_REQUEST["d"] : null
+                    ), "category = '".$_REQUEST["i"]."'");
+                }
+                else {
+                    db_insert("categories", array(
+                        "title" => isset($_REQUEST["t"]) && $_REQUEST["t"] != "" ? $_REQUEST["t"] : null,
+                        "description" => isset($_REQUEST["d"]) && $_REQUEST["d"] != "" ? $_REQUEST["d"] : null,
+                        "category" => $_REQUEST["i"]
+                    ));
+                }
             }
+            echo json_encode(array("msg" => "OK"));
+        break;
+        case LOGOUT:
+            unset($_SESSION["P3xN3w"]);
+            unset($_SESSION);
             echo json_encode(array("msg" => "OK"));
         break;
     }

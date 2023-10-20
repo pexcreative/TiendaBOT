@@ -1,9 +1,9 @@
 <?php
 	session_start();
+    require_once "convertImageTmp.php";
 	require_once 'classes/Password.php';
 	require_once 'classes/DatabasePDOInstance.function.php';
-	$db = DatabasePDOInstance();
-	
+	$db = DatabasePDOInstance();	
 
 function curl($url) {
 	$ch = curl_init($url); // Inicia sesión cURL
@@ -15,13 +15,22 @@ function curl($url) {
 	return $info; // Devuelve la información de la función
 }
 
+if(isset($_REQUEST["s"]) && $_REQUEST["s"] != "") {
+
+    $inf = curl("https://http2.mlstatic.com/resources/sites/MLA/autosuggest?showFilters=true&limit=11&api_version=2&q=".urlencode($_REQUEST["s"]));
+
+    echo json_encode(array("k" => sannedStr($_REQUEST["s"]), "r" => json_decode($inf)));
+    die();
+
+}
+
 //OBTENER ID DE CATEGORIA
 $id_categoria = 'MLA1000';
 $titulo = "Electrónica, Audio y Video";
 $keyword = "tv smart";
 $descripcion_google = 'Consigue los mejores precios para Electrónica, Audio y Video';
 
-$mla = $id_categoria != "" ? substr($id_categoria, 0, 3) : "MLA";
+$mla = $id_categoria != "" ? substr($id_categoria, 0, 3) : $mla;
 $limit = isset($_REQUEST["limit"])? $_REQUEST["limit"] : '4';
 
 
@@ -123,11 +132,14 @@ $results3 = isset($info3->suggested_queries)? $info3->suggested_queries : '';
 					$sitioweb = curl($url);
 					$info = json_decode($sitioweb);
 					$imagen_principal = isset($info->pictures[0]->secure_url)? $info->pictures[0]->secure_url : 'assets/img/sin-imagen.png';
+
+                    $newUri = "producto/".sannedStr($title)."-".substr($id, 3);
+
 					?>
 				<div class="col-md-3">
-					<div class="text-center border bg-white p-2 rounded mb-3 producto-relacionado" onclick="location.href = &#39;item.php?id=<?php echo $id;?>&#39;">
+					<div class="text-center border bg-white p-2 rounded mb-3 producto-relacionado" onclick="location.href = &#39;<?php echo $newUri;?>&#39;">
 						<img class="img-fluid list-product" data-bss-hover-animate="tada" alt="<?php echo $title;?>" src="<?php echo $imagen_principal ;?>">
-						<a href="/item.php?id=<?php echo $id;?>"><h4 class="fs-6 fw-bold text-primary sombra mb-0"><?php echo $title;?></h4></a>
+						<a href="<?php echo $newUri;?>"><h4 class="fs-6 fw-bold text-primary sombra mb-0"><?php echo $title;?></h4></a>
 						<?php if($price >= 10000){?>
 						<p class="text-success mb-0"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-truck fs-5 me-1">
 								<path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5v-7zm1.294 7.456A1.999 1.999 0 0 1 4.732 11h5.536a2.01 2.01 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456zM12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12v4zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"></path>
@@ -187,11 +199,13 @@ $results3 = isset($info3->suggested_queries)? $info3->suggested_queries : '';
 					$sitioweb = curl($url);
 					$info = json_decode($sitioweb);
 					$imagen_principal = isset($info->pictures[0]->secure_url)? $info->pictures[0]->secure_url : 'assets/img/sin-imagen.png';
+
+                    $newUri = "producto/".sannedStr($title)."-".substr($id, 3);
 					?>
 				<div class="col-md-3">
-					<div class="text-center border bg-white p-2 rounded mb-3 producto-relacionado" onclick="location.href = &#39;item.php?id=<?php echo $id;?>&#39;">
+					<div class="text-center border bg-white p-2 rounded mb-3 producto-relacionado" onclick="location.href = &#39;<?php echo $newUri;?>&#39;">
 						<img class="img-fluid list-product" data-bss-hover-animate="tada" alt="<?php echo $title;?>" src="<?php echo $imagen_principal ;?>">
-						<a href="/item.php?id=<?php echo $id;?>"><h4 class="fs-6 fw-bold text-primary sombra mb-0"><?php echo $title;?></h4></a>
+						<a href="<?php echo $newUri;?>"><h4 class="fs-6 fw-bold text-primary sombra mb-0"><?php echo $title;?></h4></a>
 						<?php if($price >= 10000){?>
 						<p class="text-success mb-0"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-truck fs-5 me-1">
 								<path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5v-7zm1.294 7.456A1.999 1.999 0 0 1 4.732 11h5.536a2.01 2.01 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456zM12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12v4zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"></path>
@@ -206,22 +220,6 @@ $results3 = isset($info3->suggested_queries)? $info3->suggested_queries : '';
         </div>
     </section>
 	
-    <div class="modal fade" role="dialog" tabindex="-1" id="buscar">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Modal Title</h4><button class="btn-close" type="button" aria-label="Close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <p>The content of your modal.</p>
-                    <form><input class="form-control" type="search"><input class="form-control form-control-color" type="color">
-                        <div class="input-group"><input class="form-control" type="text"><button class="btn btn-primary" type="button">Button</button></div>
-                    </form>
-                </div>
-                <div class="modal-footer"><button class="btn btn-light" type="button" data-bs-dismiss="modal">Close</button><button class="btn btn-primary" type="button">Save</button></div>
-            </div>
-        </div>
-    </div>
-	
+
 	<?php include_once'footer.php';?>
 	

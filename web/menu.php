@@ -5,10 +5,21 @@
 		<div class="collapse navbar-collapse" id="navcol-1">
 			<ul class="navbar-nav ms-auto">
 				<li class="nav-item"><a class="nav-link" href="/">Home</a></li>
-				<li class="nav-item"><a class="nav-link" href="categoria.php">Categoria</a></li>
-				<li class="nav-item"><a class="nav-link active" href="item.php">Producto</a></li>
-				<li class="nav-item"><a class="nav-link" href="shopping-cart.html">Categorias</a></li>
-				<li class="nav-item"><a class="nav-link rounded text-white contacto" href="contacto.html">Contacto</a></li>
+				<li class="nav-item"><a class="nav-link active" href="/productos/">Productos</a></li>
+				<li class="nav-item"><a class="nav-link" href="/categorias">Categorias</a></li>
+				<li class="nav-item"><a class="nav-link rounded text-white" href="/contacto">Contacto</a></li>
+				<?php if(isset($_SESSION["P3xN3w"])): ?>
+					<li class="nav-item dropdown bg-dark rounded ms-1 session-user">
+						<a class="dropdown-toggle nav-link text-white" aria-expanded="false" data-bs-toggle="dropdown" href="#">Mi cuenta</a>
+						<div class="dropdown-menu rounded bg-dark">
+							<a class="dropdown-item" href="#">Mis datos</a>
+							<a class="dropdown-item" href="#">Mis pedidos</a>
+							<a class="dropdown-item" href="javascript: logout();">Desconectarme</a>
+						</div>
+					</li>
+				<?php else: ?>
+
+				<?php endif ?>
 			</ul>
 		</div>
 	</div>

@@ -1,12 +1,22 @@
 <?php
+	require_once "config.php";
+	require_once "convertImageTmp.php";
 	session_start();
 	require_once 'classes/Password.php';
 	require_once 'classes/DatabasePDOInstance.function.php';
 	$db = DatabasePDOInstance();
 
+	if(isset($_REQUEST['s']) && $_REQUEST['s'] != "") {
+		$_REQUEST['s'] = implode(" ", explode('-', $_REQUEST['s']));
+		$_REQUEST['s'] = implode(" ", explode('/', $_REQUEST['s']));
+	}
+
+	if(isset($_REQUEST['cat']) && $_REQUEST['cat'] != "") {
+		$_REQUEST['id'] = $mla.$_REQUEST['cat'];
+	}
+ 
 	$id_categoria = isset($_REQUEST["id"])? $_REQUEST["id"] : 'MLA1000';
 	$search = isset($_REQUEST["s"])? $_REQUEST["s"] : '';
-
 
 	$catInfo = db_select_row("categories", "*", "category = '$id_categoria'");
 	$searchInfo = db_select_row("keywords", "*", "keyword = '$search'");
@@ -42,7 +52,7 @@ function stripStrDecode($str) {
 
 //OBTENER ID DE CATEGORIA
 
-$mla = $id_categoria != "" ? substr($id_categoria, 0, 3) : "MLA";
+$mla = $id_categoria != "" ? substr($id_categoria, 0, 3) : $mla;
 $offset = isset($_REQUEST["offset"])? $_REQUEST["offset"] : '';
 $limit = isset($_REQUEST["limit"])? $_REQUEST["limit"] : '15';
 $sort = isset($_REQUEST["sort"])? $_REQUEST["sort"] : 'relevance';
@@ -79,10 +89,10 @@ if($search != ''){
 
 foreach($_REQUEST as $k => $req) {
 	if(substr($k, 0, 2) == "__") {
-		$url .= "&" . implode("", explode("__", $k)) . "=" . stripStrDecode($req);
+		$url .= "&" . implode("", explode("__", $k)) . "=" . urlencode(urldecode($req));
 	}
 }
-//echo $url; die();
+
 
 
 
@@ -90,16 +100,21 @@ foreach($_REQUEST as $k => $req) {
 //echo $url;
 $sitioweb = curl($url);
 $info = json_decode($sitioweb);
+//var_dump($sitioweb);
+//echo $url; die();
+
 $paginas = isset($info->paging->total)? $info->paging->total : '';
 $catego = isset($info->filters[0]->values[0]->name)? $info->filters[0]->values[0]->name : '';
 
 //PRODUCTOS
 $results = isset($info->results)? $info->results : '';
 if(!isset($info->results)) {
-	header('Location: categoria.php');
+	header('Location: https://alquila2.com.ar/');
 }
-if(count($info->results) == 0) {
-	header('Location: categoria.php');
+else {
+	if(count($info->results) == 0) {
+		header('Location: https://alquila2.com.ar/');
+	}
 }
 // FILTROS
 // print_r ($info->available_filters);
@@ -119,6 +134,7 @@ $i = 0;
 $url3 = "https://api.mercadolibre.com/categories/".$id_categoria;
 $categorias = curl($url3);
 $info3 = json_decode($categorias);
+$categoria_principal = isset($info3->path_from_root[0]->id)? $info3->path_from_root[0]->id : '';
 $caterories = isset($info3->path_from_root)? $info3->path_from_root : '';
 $children_categories = isset($info3->children_categories)? $info3->children_categories : '';
 
@@ -144,6 +160,18 @@ $children_categories = isset($info3->children_categories)? $info3->children_cate
 		if($searchInfo["title"] && $searchInfo["title"] != "") {
 			$catego = $searchInfo["title"];
 		}
+		if($searchInfo["description"] && $searchInfo["description"] != "") {
+			$desc = $searchInfo["description"];
+		}
+	}
+
+	function contieneSimbolos($cadena) {
+		$patron = '/[^\p{L}\p{N}]+/u';
+		if (preg_match($patron, $cadena)) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 ?>
@@ -153,6 +181,7 @@ $children_categories = isset($info3->children_categories)? $info3->children_cate
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+	<meta name="description" content="Encontrá lo que buscás. Todo lo que necesitas lo conseguís en un solo lugar">
     <title><?php echo $catego;?></title>
     <?php include_once'head.php';?>
 	
@@ -172,7 +201,9 @@ $children_categories = isset($info3->children_categories)? $info3->children_cate
                 <!-- <li class="breadcrumb-item"><a href="#"><span>Electrónica, Audio y Video</span></a></li>-->
 				<?php
 					foreach ($caterories as &$categoria) {
-						echo '<li class="breadcrumb-item"><a href="/categoria.php?id='.$categoria->id.'"><span>'.$categoria->name.'</span></a></li>';
+						//$newUriCat = $categoria->id;
+						$newUriCat = sannedStr($categoria->name)."/".substr($categoria->id, 3);
+						echo '<li class="breadcrumb-item"><a href="/categoria/'.$newUriCat.'"><span>'.$categoria->name.'</span></a></li>';
 					}
 				?>
             </ol>
@@ -190,7 +221,9 @@ $children_categories = isset($info3->children_categories)? $info3->children_cate
 							</a>
 						<?php endif ?>
 					</h1>
-                    <p class="descLabel mb-0"><?php echo $desc; ?></p>
+                    <div class="descLabel mb-0">
+						<?php echo $desc; ?>
+					</div>
 					<div class="google-sidebar text-center">PUBLICIDAD</div>
                 </div>
 				<?php
@@ -226,20 +259,22 @@ $children_categories = isset($info3->children_categories)? $info3->children_cate
 							$imagen_principal = isset($info->pictures[0]->secure_url)? $info->pictures[0]->secure_url : 'assets/img/sin-imagen.png';
 							$condition = isset($info->condition)? $info->condition : '';
 							?>
-							<?php if($condition == 'new'){?>
-							<div class="col-12 p-0 list-group-item rounded" onclick="location.href = &#39;/item.php?id=<?php echo $id;?>&#39;">
+							<?php if($condition == 'new')
+								$urlNew = "producto/".sannedStr($title)."-".substr($id, 3);
+							{?>
+							<div class="col-12 p-0 list-group-item rounded" onclick="location.href = &#39;/<?php echo $urlNew;?>&#39;">
                             <div class="text-center p-2">
                                 <div class="row">
-                                    <div class="col-md-3"><a class="list-product" href="/item.php?id=<?php echo $id;?>"><img data-bss-hover-animate="tada" class="producto list-product rounded" src="<?php echo $imagen_principal ;?>" alt="<?php echo $title;?>" height="160" width="160"></a></div>
+                                    <div class="col-md-3"><a class="list-product" href="/<?php echo $urlNew;?>"><img data-bss-hover-animate="tada" class="producto list-product rounded" src="<?php echo descargarYGuardarImagen($imagen_principal, "tmpfiles", substr($id, 3)."-1") ;?>" alt="<?php echo $title;?>" height="160" width="160"></a></div>
                                     <div class="col text-start pt-3">
-										<a href="/item.php?id=<?php echo $id;?>"><h2 class="text-capitalize fs-5 text-primary"><?php echo $title;?></h2></a>
-                                        <p class="fs-5 sombra mb-0">$<?php echo number_format($price,0,",",".");?></p>
+										<a href="/<?php echo $urlNew;?>"><h2 class="text-capitalize fs-5 text-primary"><?php echo $title;?></h2></a>
+                                        <p class="fs-5 sombra mb-0 <?php filtro_ocultar($categoria_principal);?>">$<?php echo number_format($price,0,",",".");?></p>
                                         
 										<?php if($price >= 250000){?>
-										<p class="text-success mb-0"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-credit-card-2-back fs-5 me-1"><path d="M11 5.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-1z"></path><path d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2zm13 2v5H1V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1zm-1 9H2a1 1 0 0 1-1-1v-1h14v1a1 1 0 0 1-1 1z"></path></svg>12 cuotas de $<?php echo number_format(($price/12),0,",",".");?></p>
+										<p class="text-success mb-0 <?php filtro_ocultar($categoria_principal);?>"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-credit-card-2-back fs-5 me-1"><path d="M11 5.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-1z"></path><path d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H2zm13 2v5H1V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1zm-1 9H2a1 1 0 0 1-1-1v-1h14v1a1 1 0 0 1-1 1z"></path></svg>12 cuotas de $<?php echo number_format(($price/12),0,",",".");?></p>
 										<?php }?>
 										<?php if($price >= 10000){?>
-										<p class="text-success mb-0"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-truck fs-5 me-1">
+										<p class="text-success mb-0 <?php filtro_ocultar($categoria_principal);?>"><svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 16 16" class="bi bi-truck fs-5 me-1">
                                                 <path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h9A1.5 1.5 0 0 1 12 3.5V5h1.02a1.5 1.5 0 0 1 1.17.563l1.481 1.85a1.5 1.5 0 0 1 .329.938V10.5a1.5 1.5 0 0 1-1.5 1.5H14a2 2 0 1 1-4 0H5a2 2 0 1 1-3.998-.085A1.5 1.5 0 0 1 0 10.5v-7zm1.294 7.456A1.999 1.999 0 0 1 4.732 11h5.536a2.01 2.01 0 0 1 .732-.732V3.5a.5.5 0 0 0-.5-.5h-9a.5.5 0 0 0-.5.5v7a.5.5 0 0 0 .294.456zM12 10a2 2 0 0 1 1.732 1h.768a.5.5 0 0 0 .5-.5V8.35a.5.5 0 0 0-.11-.312l-1.48-1.85A.5.5 0 0 0 13.02 6H12v4zm-9 1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm9 0a1 1 0 1 0 0 2 1 1 0 0 0 0-2z"></path>
                                             </svg>Consulta por Envío gratis</p>
 										<?php }?>	
@@ -254,10 +289,10 @@ $children_categories = isset($info3->children_categories)? $info3->children_cate
                     <nav class="d-flex justify-content-center my-3">
                         <ul class="pagination">
                             <li class="page-item"><a class="page-link" aria-label="Previous" href="#"><span aria-hidden="true">«</span></a></li>
-                            <li class="page-item"><a class="page-link" href="/categoria.php?id=<?php echo $id_categoria;?>&offset=0">1</a></li>
-                            <li class="page-item"><a class="page-link" href="/categoria.php?id=<?php echo $id_categoria;?>&offset=15">2</a></li>
-                            <li class="page-item"><a class="page-link" href="/categoria.php?id=<?php echo $id_categoria;?>&offset=30">3</a></li>
-							<li class="page-item"><a class="page-link" href="/categoria.php?id=<?php echo $id_categoria;?>&offset=45">4</a></li>
+                            <li class="page-item"><a class="page-link" href="<?php echo $actual_link;?>&offset=0">1</a></li>
+                            <li class="page-item"><a class="page-link" href="<?php echo $actual_link;?>&offset=15">2</a></li>
+                            <li class="page-item"><a class="page-link" href="<?php echo $actual_link;?>&offset=30">3</a></li>
+							<li class="page-item"><a class="page-link" href="<?php echo $actual_link;?>&offset=45">4</a></li>
                             <li class="page-item"><a class="page-link" aria-label="Next" href="#"><span aria-hidden="true">»</span></a></li>
                         </ul>
                     </nav>
@@ -269,7 +304,8 @@ $children_categories = isset($info3->children_categories)? $info3->children_cate
                     <h3 class="fs-5 p-2 bg-warning bg-gradient text-dark rounded mb-1">Categorias</h3>
                     <ul class="text-capitalize list-unstyled ps-2 list-group mb-2">
 						<?php foreach ($children_categories as &$children) {
-							echo '<li><a href="/categoria.php?id='.$children->id.'" class="list-group-item text-black">'.$children->name.'</a></li>';
+							$newUriCat = sannedStr($children->name)."/".substr($children->id, 3);
+							echo '<li><a href="/categoria/'.$newUriCat.'" class="list-group-item text-black">'.$children->name.'</a></li>';
 						}?>
                     </ul>
 					<?php }?>
@@ -284,8 +320,9 @@ $children_categories = isset($info3->children_categories)? $info3->children_cate
 								<ul class="text-capitalize list-unstyled ps-2 list-group mb-2">
 				<?php
 								for($ind = 0; $ind < (count($filter->values) <= 10 ? count($filter->values) : 10); $ind++):
+									$idTmp = urlencode($filter->values[$ind]->id);
 				?>
-								<li><a href="<?php echo $actual_link;?>&__<?php echo $filter->id; ?>=<?php echo stripStr($filter->values[$ind]->id); ?>" class="list-group-item text-black"> <?php echo $filter->values[$ind]->name." <span class='d-none'>(".$filter->values[$ind]->results.")</span>"; ?> </a></li>
+								<li><a href="<?php echo $actual_link;?>&__<?php echo $filter->id; ?>=<?php echo $idTmp; ?>" class="list-group-item text-black"> <?php echo $filter->values[$ind]->name." <span class='d-none'>(".$filter->values[$ind]->results.")</span>"; ?> </a></li>
 				<?php
 								endfor;
 				?>
@@ -311,12 +348,10 @@ $children_categories = isset($info3->children_categories)? $info3->children_cate
 					<label for="titleForm" class="form-label">Titulo</label>
 					<input type="text" class="form-control" id="titleForm" placeholder="<?php echo $catego; ?>" value="<?php echo $catego; ?>">
 				</div>
-				<?php if($search == ""): ?>
 				<div class="mb-3">
 					<label for="descForm" class="form-label">Descripcion</label>
 					<textarea class="form-control" id="descForm" rows="8" placeholder="<?php echo $desc; ?>"><?php echo $desc; ?></textarea>
 				</div>
-			<?php endif ?>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-secondary closeModal" data-bs-dismiss="modal">Cerrar</button>
@@ -346,6 +381,12 @@ $children_categories = isset($info3->children_categories)? $info3->children_cate
 		content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
 	});
 
+	document.addEventListener('focusin', function (e) { 
+		if (e.target.closest('.tox-tinymce-aux, .moxman-window, .tam-assetmanager-root') !== null) { 
+			e.stopImmediatePropagation();
+		} 
+	});
+
 	var idp = "<?php echo $id_categoria; ?>";
 	var search = "<?php echo $search; ?>";
 	function saveInfo(el) {
@@ -353,19 +394,19 @@ $children_categories = isset($info3->children_categories)? $info3->children_cate
 		$("#saveInfo").addClass("disabled");
 		$.ajax({
 			type: 'POST',
-			url: 'server/',
-			data: 'o=3&t='+$("#titleForm").val()+'&d='+$("#descForm").val()+'&i='+(search != "" ? search : idp)+'&s=' + $(el).attr("data-s"),
+			url: '/server/',
+			data: 'o=3&t='+$("#titleForm").val()+'&d='+tinymce.activeEditor.getContent()+'&i='+(search != "" ? search : idp)+'&s=' + $(el).attr("data-s"),
 			dataType: 'json',
 			success: function(data) {
 				var title = $("#titleForm").val();
-				var desc = $("#descForm").val();
+				var desc = tinymce.activeEditor.getContent();
 				$(".titleLabel").html(title);
 				$(".descLabel").html(desc);
 				$("#saveInfo").attr("disabled", false);
 				$("#saveInfo").removeClass("disabled");
 				$(".closeModal").trigger("click");
 				$("#titleForm").val(title).attr("placeholder", title);
-				$("#descForm").val(desc).attr("placeholder", desc);
+				//$("#descForm").val(desc).attr("placeholder", desc);
 			}
 		});
 	}

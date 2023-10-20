@@ -1,12 +1,47 @@
 RewriteEngine On
-RewriteRule ^categoria/(.*)$ /categoria.php?id=$1 [L]
+RewriteRule ^categoria/(.*)/(.*)$ /categoria.php?id=$1&cat=$2 [L]
 RewriteRule ^productos/(.*)$ /categoria.php?s=$1 [L]
-#RewriteRule ^producto/([^/]+)-(\d+)$ item.php?id=$2&name=$1 [L]
+RewriteRule ^producto/(.*)$ /item.php?id=$1 [L]
+RewriteRule ^contacto$ /contacto.php [L]
+RewriteRule ^categorias$ /categorias.php [L]
 ErrorDocument 404 /index.php
 
 
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
-LogLevel alert rewrite:trace6
+
+#Habilitar el almacenamiento en cache del navegador
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType text/css "access plus 1 month"
+    ExpiresByType text/javascript "access plus 1 month"
+</IfModule>
+#Habilitar la compresion GZIP
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE image/x-icon
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+</IfModule>
+#Habilitar la compresion de imagenes
+<IfModule mod_filter.c>
+    AddOutputFilterByType DEFLATE image/jpeg image/jpg image/png image/gif
+</IfModule>
+
+
 
 
 # php -- BEGIN cPanel-generated handler, do not edit
@@ -30,7 +65,7 @@ LogLevel alert rewrite:trace6
    php_value session.gc_maxlifetime 7200
    php_value session.save_path "/var/cpanel/php/sessions/ea-php82"
    php_value upload_max_filesize 1024M
-   php_flag zlib.output_compression Off
+   php_flag zlib.output_compression On
 </IfModule>
 <IfModule lsapi_module>
    php_flag display_errors Off
@@ -42,7 +77,6 @@ LogLevel alert rewrite:trace6
    php_value session.gc_maxlifetime 7200
    php_value session.save_path "/var/cpanel/php/sessions/ea-php82"
    php_value upload_max_filesize 1024M
-   php_flag zlib.output_compression Off
+   php_flag zlib.output_compression On
 </IfModule>
 # END cPanel-generated php ini directives, do not edit
-
