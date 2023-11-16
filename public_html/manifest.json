@@ -1,0 +1,24 @@
+{
+  "name": "MovilPro",
+  "short_name": "MovilPro",
+  "description": "Encontrá lo que buscás. Todo lo que necesitas lo conseguís en un solo lugar",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#FFC600",
+  "splash_pages": [
+    {
+      "src": "/splash.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+	  "purpose": "any maskable"
+	}
+  ]
+}

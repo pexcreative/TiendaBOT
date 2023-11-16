@@ -1,0 +1,16 @@
+[28-Oct-2023 04:31:55 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'nvOpzp; AND 1=1 OR (<'">iKO)),'' at line 1 in /home/alquila2/public_html/classes/DatabasePDO.class.php:117
+Stack trace:
+#0 /home/alquila2/public_html/classes/DatabasePDO.class.php(117): PDOStatement->execute()
+#1 /home/alquila2/public_html/classes/DatabasePDO.class.php(150): DatabasePDO->query('SELECT * FROM k...', Array)
+#2 /home/alquila2/public_html/classes/DatabasePDOInstance.function.php(50): DatabasePDO->getRow('SELECT * FROM k...')
+#3 /home/alquila2/public_html/categoria.php(20): db_select_row('keywords', '*', 'keyword = ''nvO...')
+#4 {main}
+  thrown in /home/alquila2/public_html/classes/DatabasePDO.class.php on line 117
+[28-Oct-2023 04:37:00 UTC] PHP Fatal error:  Uncaught PDOException: SQLSTATE[42000]: Syntax error or access violation: 1064 You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'nvOpzp; AND 1=1 OR (<'">iKO)),'' at line 1 in /home/alquila2/public_html/classes/DatabasePDO.class.php:117
+Stack trace:
+#0 /home/alquila2/public_html/classes/DatabasePDO.class.php(117): PDOStatement->execute()
+#1 /home/alquila2/public_html/classes/DatabasePDO.class.php(150): DatabasePDO->query('SELECT * FROM k...', Array)
+#2 /home/alquila2/public_html/classes/DatabasePDOInstance.function.php(50): DatabasePDO->getRow('SELECT * FROM k...')
+#3 /home/alquila2/public_html/categoria.php(20): db_select_row('keywords', '*', 'keyword = ''nvO...')
+#4 {main}
+  thrown in /home/alquila2/public_html/classes/DatabasePDO.class.php on line 117

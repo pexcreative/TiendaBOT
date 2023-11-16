@@ -1,5 +1,4 @@
 <?php
-    require_once '../classes/Password.php';
     require_once '../classes/DatabasePDOInstance.function.php';
     
     ini_set('display_errors', 1);
