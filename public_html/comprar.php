@@ -61,3 +61,19 @@ $imagen_principal = isset($info->pictures[0]->secure_url)? $info->pictures[0]->s
     </section>
 
 <?php include_once'footer.php';?>
+
+<script>
+    var msg = "";
+    var color = localStorage.getItem("color");
+    if(color && color != "") {
+        localStorage.removeItem("color");
+        msg = ` Color: ${color}`
+    }
+    var talle = localStorage.getItem("talle");
+    if(talle && talle != "") {
+        localStorage.removeItem("talle");
+        msg += ` Talle: ${talle}`
+    }
+    console.log("mess", msg);
+    $("#mensaje").val(msg);
+</script>

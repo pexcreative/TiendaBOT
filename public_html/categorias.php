@@ -18,7 +18,9 @@ $categorias = curl($url);
 $info = json_decode($categorias);
 $children_categories = isset($info->children_categories)? $info->children_categories : '';
 
-
+$categoriesArr = array(
+	
+);
 ?>
 <!DOCTYPE html>
 <html data-bs-theme="light" lang="es">
@@ -41,6 +43,10 @@ $children_categories = isset($info->children_categories)? $info->children_catego
 			<?php
 				foreach ($children_categories as &$children) {
 					$newUriCat = sannedStr($children->name)."/".substr($children->id, 3);
+					$categoriesArr[] = array(
+						$children->name . " " . $children->total_items_in_this_category,
+						$children->total_items_in_this_category
+					);
 					?>
 
 					<div class="col-md-6">
@@ -61,9 +67,43 @@ $children_categories = isset($info->children_categories)? $info->children_catego
 						</ul>
 					</div>
 			<?php }?>
-                
+
+			<div class="col-md-12">
+				<div id="donutchart" class="col-md-12" style="height: 500px;"></div>
+			</div>
+			
             </div>
         </div>
     </section>
+
+	<?php
+		function compare($a, $b) {
+			return $b[1] - $a[1];
+		}
+	
+		usort($categoriesArr, 'compare');
+
+		$newArr = array_merge(array( array("Categorias", "") ), $categoriesArr);
+		$categoriesArr = $newArr;
+
+	?>
+
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<script type="text/javascript">
+	  var arr = <?php echo json_encode($categoriesArr); ?>;
+      google.charts.load("current", {packages:["corechart"]});
+      google.charts.setOnLoadCallback(drawChart);
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable(arr);
+
+        var options = {
+          title: 'Categorias',
+          pieHole: 0.4,
+        };
+
+        var chart = new google.visualization.PieChart(document.getElementById('donutchart'));
+        chart.draw(data, options);
+      }
+    </script>
 
 <?php include_once'footer.php';?>

@@ -20,6 +20,9 @@
 						<div class="dropdown-menu rounded">
 							<a class="dropdown-item" href="#">Mis datos</a>
 							<a class="dropdown-item" href="#">Mis pedidos</a>
+							<?php if($shopUpdate): ?>
+								<a class="dropdown-item bg-danger text-white" onclick="upds();" href="javascript: void(0);">Actualizar tienda</a>
+							<?php endif ?>
 							<a class="dropdown-item" href="javascript: logout();">Desconectarme</a>
 						</div>
 					</li>

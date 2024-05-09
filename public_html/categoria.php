@@ -63,11 +63,11 @@ $catego = isset($info->filters[0]->values[0]->name)? $info->filters[0]->values[0
 //PRODUCTOS
 $results = isset($info->results)? $info->results : '';
 if(!isset($info->results)) {
-	header('Location: https://alquila2.com.ar/');
+	header('Location: https://'.$_SERVER['HTTP_HOST']);
 }
 else {
 	if(count($info->results) == 0) {
-		header('Location: https://alquila2.com.ar/');
+		header('Location: https://'.$_SERVER['HTTP_HOST']);
 	}
 }
 // FILTROS

@@ -1,8 +1,8 @@
 <?php
-$url_ganancia = 'https://tiendaspexbot-default-rtdb.firebaseio.com/-NhPDwNYG-e7PzB0eSYl.json';
-$ganancia = curl($url_ganancia);
-$infog = json_decode($ganancia);
-$porcentaje = isset($infog->ganancia)? $infog->ganancia : '';
+// $url_ganancia = 'https://tiendaspexbot-default-rtdb.firebaseio.com/-NhPDwNYG-e7PzB0eSYl.json';
+// $ganancia = curl($url_ganancia);
+// $infog = json_decode($ganancia);
+// $porcentaje = isset($infog->ganancia)? $infog->ganancia : '';
 
 if ($precio > 100000) {
 	$precio += $precio * 0.05;  // Aumenta en un 5%
