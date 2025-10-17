@@ -1,0 +1,35 @@
+<nav class="navbar navbar-expand-md sticky-top navbar-shrink py-2 navbar-light" id="mainNav">
+	<div class="container">
+	<?php if($logo == ''){?>
+	<a class="navbar-brand d-flex align-items-center" href="/" style="font-family:'Signika Negative',sans-serif;font-size:2.3rem;"><?php echo $empresa;?></a>
+	<?}else{?>
+	<a class="navbar-brand d-flex align-items-center" href="/"><img alt="<?php echo $empresa;?>" class="img-fluid" src="<?php echo $logo;?>" height="49"></a>
+	<?php }?>
+	
+		
+		<button data-bs-toggle="collapse" class="navbar-toggler" data-bs-target="#navcol-1"><span class="visually-hidden">Toggle navigation</span><span class="navbar-toggler-icon"></span></button>
+		<div class="collapse navbar-collapse" id="navcol-1">
+			<ul class="navbar-nav ms-auto">
+				<li class="nav-item rounded"><a class="nav-link" href="/">Home</a></li>
+				<li class="nav-item rounded"><a class="nav-link" href="/productos/jeans-de-mujer/">Productos</a></li>
+				<li class="nav-item rounded"><a class="nav-link" href="/categorias">Categorias</a></li>
+				<li class="nav-item rounded"><a class="nav-link" href="/contacto">Contacto</a></li>
+				<?php if(isset($_SESSION["P3xN3w"])): ?>
+					<li class="nav-item dropdown bg-dark rounded ms-1 session-user">
+						<a class="dropdown-toggle nav-link text-white" aria-expanded="false" data-bs-toggle="dropdown" href="#">Mi cuenta</a>
+						<div class="dropdown-menu rounded">
+							<a class="dropdown-item" href="#">Mis datos</a>
+							<a class="dropdown-item" href="#">Mis pedidos</a>
+							<?php if($shopUpdate): ?>
+								<a class="dropdown-item bg-danger text-white" onclick="upds();" href="javascript: void(0);">Actualizar tienda</a>
+							<?php endif ?>
+							<a class="dropdown-item" href="javascript: logout();">Desconectarme</a>
+						</div>
+					</li>
+				<?php else: ?>
+
+				<?php endif ?>
+			</ul>
+		</div>
+	</div>
+</nav>

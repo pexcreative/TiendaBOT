@@ -1,0 +1,232 @@
+# Redirección a HTTPS
+RewriteEngine On
+RewriteCond %{SERVER_PORT} 80
+RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R,L]
+
+# Redirección de producto a productos si no hay un número después
+RewriteRule ^producto/(.*[^0-9])$ /productos/$1 [R,L]
+
+
+# Reescritura de URLs amigables para categorías y productos
+RewriteRule ^categoria/(.*)/(.*)$ /categoria.php?id=$1&cat=$2 [L]
+RewriteRule ^productos/(.*)$ /categoria.php?s=$1 [L]
+RewriteRule ^producto/(.*)$ /item.php?id=$1 [L]
+RewriteRule ^contacto$ /contacto.php [L]
+RewriteRule ^categorias$ /categorias.php [L]
+
+# Manejo de errores 404
+ErrorDocument 404 /index.php
+
+# Reescritura de sitemap y robots
+RewriteRule ^sitemap\.xml$ sitemap.php [L]
+RewriteRule ^sitemap$ sitemap.php [L]
+RewriteRule ^robots\.txt$ robots.php [L]
+
+# Redireccionamiento
+RewriteRule ^abanicos/95390$ https://ropaenavellaneda.com.ar/categoria/abanicos/95390 [R=302,L]
+RewriteRule ^abrigos/455528$ https://ropaenavellaneda.com.ar/categoria/abrigos/455528 [R=302,L]
+RewriteRule ^accesorios-de-moda/3114$ https://ropaenavellaneda.com.ar/categoria/accesorios-de-moda/3114 [R=302,L]
+RewriteRule ^accesorios-para-el-cabello/437215$ https://ropaenavellaneda.com.ar/categoria/accesorios-para-el-cabello/437215 [R=302,L]
+RewriteRule ^accesorios-tacticos/455530$ https://ropaenavellaneda.com.ar/categoria/accesorios-tacticos/455530 [R=302,L]
+RewriteRule ^accesorios/24771$ https://ropaenavellaneda.com.ar/categoria/accesorios/24771 [R=302,L]
+RewriteRule ^accesorios/431991$ https://ropaenavellaneda.com.ar/categoria/accesorios/431991 [R=302,L]
+RewriteRule ^alpargatas/414673$ https://ropaenavellaneda.com.ar/categoria/alpargatas/414673 [R=302,L]
+RewriteRule ^anteojos-y-accesorios/3959$ https://ropaenavellaneda.com.ar/categoria/anteojos-y-accesorios/3959 [R=302,L]
+RewriteRule ^antifaces-para-dormir/417715$ https://ropaenavellaneda.com.ar/categoria/antifaces-para-dormir/417715 [R=302,L]
+RewriteRule ^batas/86455$ https://ropaenavellaneda.com.ar/categoria/batas/86455 [R=302,L]
+RewriteRule ^bermudas-y-shorts/109276$ https://ropaenavellaneda.com.ar/categoria/bermudas-y-shorts/109276 [R=302,L]
+RewriteRule ^bermudas-y-shorts/113084$ https://ropaenavellaneda.com.ar/categoria/bermudas-y-shorts/113084 [R=302,L]
+RewriteRule ^billeteras-y-monederos/417712$ https://ropaenavellaneda.com.ar/categoria/billeteras-y-monederos/417712 [R=302,L]
+RewriteRule ^blusas/417226$ https://ropaenavellaneda.com.ar/categoria/blusas/417226 [R=302,L]
+RewriteRule ^blusas/417937$ https://ropaenavellaneda.com.ar/categoria/blusas/417937 [R=302,L]
+RewriteRule ^bodys/10271$ https://ropaenavellaneda.com.ar/categoria/bodys/10271 [R=302,L]
+RewriteRule ^bolsos-deportivos/432002$ https://ropaenavellaneda.com.ar/categoria/bolsos-deportivos/432002 [R=302,L]
+RewriteRule ^botas-y-botinetas/414251$ https://ropaenavellaneda.com.ar/categoria/botas-y-botinetas/414251 [R=302,L]
+RewriteRule ^bufandas-y-panuelos/437217$ https://ropaenavellaneda.com.ar/categoria/bufandas-y-panuelos/437217 [R=302,L]
+RewriteRule ^buzos-y-hoodies/109085$ https://ropaenavellaneda.com.ar/categoria/buzos-y-hoodies/109085 [R=302,L]
+RewriteRule ^buzos/24738$ https://ropaenavellaneda.com.ar/categoria/buzos/24738 [R=302,L]
+RewriteRule ^buzos/417369$ https://ropaenavellaneda.com.ar/categoria/buzos/417369 [R=302,L]
+RewriteRule ^calzado/109026$ https://ropaenavellaneda.com.ar/categoria/calzado/109026 [R=302,L]
+RewriteRule ^calzados/11796$ https://ropaenavellaneda.com.ar/categoria/calzados/11796 [R=302,L]
+RewriteRule ^calzas/417367$ https://ropaenavellaneda.com.ar/categoria/calzas/417367 [R=302,L]
+RewriteRule ^calzas/95955$ https://ropaenavellaneda.com.ar/categoria/calzas/95955 [R=302,L]
+RewriteRule ^camisas/39986$ https://ropaenavellaneda.com.ar/categoria/camisas/39986 [R=302,L]
+RewriteRule ^camisas/417218$ https://ropaenavellaneda.com.ar/categoria/camisas/417218 [R=302,L]
+RewriteRule ^camperas-tapados-y-trenchs/109096$ https://ropaenavellaneda.com.ar/categoria/camperas-tapados-y-trenchs/109096 [R=302,L]
+RewriteRule ^camperas/24739$ https://ropaenavellaneda.com.ar/categoria/camperas/24739 [R=302,L]
+RewriteRule ^camperas/417368$ https://ropaenavellaneda.com.ar/categoria/camperas/417368 [R=302,L]
+RewriteRule ^carteras/120353$ https://ropaenavellaneda.com.ar/categoria/carteras/120353 [R=302,L]
+RewriteRule ^chatitas/415192$ https://ropaenavellaneda.com.ar/categoria/chatitas/415192 [R=302,L]
+RewriteRule ^cinturones/412049$ https://ropaenavellaneda.com.ar/categoria/cinturones/412049 [R=302,L]
+RewriteRule ^conjuntos-deportivos/417374$ https://ropaenavellaneda.com.ar/categoria/conjuntos-deportivos/417374 [R=302,L]
+RewriteRule ^conjuntos/39956$ https://ropaenavellaneda.com.ar/categoria/conjuntos/39956 [R=302,L]
+RewriteRule ^corbatas/6514$ https://ropaenavellaneda.com.ar/categoria/corbatas/6514 [R=302,L]
+RewriteRule ^cubre-zapatos/455893$ https://ropaenavellaneda.com.ar/categoria/cubre-zapatos/455893 [R=302,L]
+RewriteRule ^enteritos/109254$ https://ropaenavellaneda.com.ar/categoria/enteritos/109254 [R=302,L]
+RewriteRule ^equipaje-bolsos-y-carteras/110761$ https://ropaenavellaneda.com.ar/categoria/equipaje-bolsos-y-carteras/110761 [R=302,L]
+RewriteRule ^equipaje-y-accesorios-de-viaje/431994$ https://ropaenavellaneda.com.ar/categoria/equipaje-y-accesorios-de-viaje/431994 [R=302,L]
+RewriteRule ^espejitos/95403$ https://ropaenavellaneda.com.ar/categoria/espejitos/95403 [R=302,L]
+RewriteRule ^fajas/95389$ https://ropaenavellaneda.com.ar/categoria/fajas/95389 [R=302,L]
+RewriteRule ^filtros-para-tapabocas/454755$ https://ropaenavellaneda.com.ar/categoria/filtros-para-tapabocas/454755 [R=302,L]
+RewriteRule ^gorras/67460$ https://ropaenavellaneda.com.ar/categoria/gorras/67460 [R=302,L]
+RewriteRule ^gorros-sombreros-y-boinas/430271$ https://ropaenavellaneda.com.ar/categoria/gorros-sombreros-y-boinas/430271 [R=302,L]
+RewriteRule ^guantes-y-mitones/412050$ https://ropaenavellaneda.com.ar/categoria/guantes-y-mitones/412050 [R=302,L]
+RewriteRule ^guantes/417386$ https://ropaenavellaneda.com.ar/categoria/guantes/417386 [R=302,L]
+RewriteRule ^guardapolvos-escolares/95483$ https://ropaenavellaneda.com.ar/categoria/guardapolvos-escolares/95483 [R=302,L]
+RewriteRule ^indumentaria-laboral-y-escolar/12554$ https://ropaenavellaneda.com.ar/categoria/indumentaria-laboral-y-escolar/12554 [R=302,L]
+RewriteRule ^indumentaria-tactica/95489$ https://ropaenavellaneda.com.ar/categoria/indumentaria-tactica/95489 [R=302,L]
+RewriteRule ^jardineros/24757$ https://ropaenavellaneda.com.ar/categoria/jardineros/24757 [R=302,L]
+RewriteRule ^kimonos/455550$ https://ropaenavellaneda.com.ar/categoria/kimonos/455550 [R=302,L]
+RewriteRule ^kits-de-mochilas-escolares/455455$ https://ropaenavellaneda.com.ar/categoria/kits-de-mochilas-escolares/455455 [R=302,L]
+RewriteRule ^kits-para-salida-del-hospital/437433$ https://ropaenavellaneda.com.ar/categoria/kits-para-salida-del-hospital/437433 [R=302,L]
+RewriteRule ^llaveros/412060$ https://ropaenavellaneda.com.ar/categoria/llaveros/412060 [R=302,L]
+RewriteRule ^lotes-de-ropa/413460$ https://ropaenavellaneda.com.ar/categoria/lotes-de-ropa/413460 [R=302,L]
+RewriteRule ^luncheras-escolares/412348$ https://ropaenavellaneda.com.ar/categoria/luncheras-escolares/412348 [R=302,L]
+RewriteRule ^maletines/120352$ https://ropaenavellaneda.com.ar/categoria/maletines/120352 [R=302,L]
+RewriteRule ^mangas-de-compresion/413345$ https://ropaenavellaneda.com.ar/categoria/mangas-de-compresion/413345 [R=302,L]
+RewriteRule ^medias/417388$ https://ropaenavellaneda.com.ar/categoria/medias/417388 [R=302,L]
+RewriteRule ^medias/86457$ https://ropaenavellaneda.com.ar/categoria/medias/86457 [R=302,L]
+RewriteRule ^mocasines-y-oxfords/414674$ https://ropaenavellaneda.com.ar/categoria/mocasines-y-oxfords/414674 [R=302,L]
+RewriteRule ^mochilas/120350$ https://ropaenavellaneda.com.ar/categoria/mochilas/120350 [R=302,L]
+RewriteRule ^neceseres/120368$ https://ropaenavellaneda.com.ar/categoria/neceseres/120368 [R=302,L]
+RewriteRule ^orejeras/95200$ https://ropaenavellaneda.com.ar/categoria/orejeras/95200 [R=302,L]
+RewriteRule ^otros-accesorios/412057$ https://ropaenavellaneda.com.ar/categoria/otros-accesorios/412057 [R=302,L]
+RewriteRule ^otros/120356$ https://ropaenavellaneda.com.ar/categoria/otros/120356 [R=302,L]
+RewriteRule ^otros/1911$ https://ropaenavellaneda.com.ar/categoria/otros/1911 [R=302,L]
+RewriteRule ^otros/415193$ https://ropaenavellaneda.com.ar/categoria/otros/415193 [R=302,L]
+RewriteRule ^otros/417373$ https://ropaenavellaneda.com.ar/categoria/otros/417373 [R=302,L]
+RewriteRule ^otros/455529$ https://ropaenavellaneda.com.ar/categoria/otros/455529 [R=302,L]
+RewriteRule ^otros/4919$ https://ropaenavellaneda.com.ar/categoria/otros/4919 [R=302,L]
+RewriteRule ^otros/95484$ https://ropaenavellaneda.com.ar/categoria/otros/95484 [R=302,L]
+RewriteRule ^pantalones-y-joggings/417370$ https://ropaenavellaneda.com.ar/categoria/pantalones-y-joggings/417370 [R=302,L]
+RewriteRule ^pantalones/109282$ https://ropaenavellaneda.com.ar/categoria/pantalones/109282 [R=302,L]
+RewriteRule ^pantalones/24703$ https://ropaenavellaneda.com.ar/categoria/pantalones/24703 [R=302,L]
+RewriteRule ^pantuflas/414610$ https://ropaenavellaneda.com.ar/categoria/pantuflas/414610 [R=302,L]
+RewriteRule ^paraguas/412056$ https://ropaenavellaneda.com.ar/categoria/paraguas/412056 [R=302,L]
+RewriteRule ^pareos/412059$ https://ropaenavellaneda.com.ar/categoria/pareos/412059 [R=302,L]
+RewriteRule ^pijamas/39957$ https://ropaenavellaneda.com.ar/categoria/pijamas/39957 [R=302,L]
+RewriteRule ^polainas/95385$ https://ropaenavellaneda.com.ar/categoria/polainas/95385 [R=302,L]
+RewriteRule ^polleras/373771$ https://ropaenavellaneda.com.ar/categoria/polleras/373771 [R=302,L]
+RewriteRule ^polleras/39977$ https://ropaenavellaneda.com.ar/categoria/polleras/39977 [R=302,L]
+RewriteRule ^prendedores-y-broches/42434$ https://ropaenavellaneda.com.ar/categoria/prendedores-y-broches/42434 [R=302,L]
+RewriteRule ^remeras-musculosas-y-chombas/109042$ https://ropaenavellaneda.com.ar/categoria/remeras-musculosas-y-chombas/109042 [R=302,L]
+RewriteRule ^remeras-musculosas-y-chombas/6553$ https://ropaenavellaneda.com.ar/categoria/remeras-musculosas-y-chombas/6553 [R=302,L]
+RewriteRule ^remeras-y-chombas/417371$ https://ropaenavellaneda.com.ar/categoria/remeras-y-chombas/417371 [R=302,L]
+RewriteRule ^rinoneras/417710$ https://ropaenavellaneda.com.ar/categoria/rinoneras/417710 [R=302,L]
+RewriteRule ^ropa-de-danza-y-patinaje/417479$ https://ropaenavellaneda.com.ar/categoria/ropa-de-danza-y-patinaje/417479 [R=302,L]
+RewriteRule ^ropa-de-dormir/4971$ https://ropaenavellaneda.com.ar/categoria/ropa-de-dormir/4971 [R=302,L]
+RewriteRule ^ropa-deportiva/6839$ https://ropaenavellaneda.com.ar/categoria/ropa-deportiva/6839 [R=302,L]
+RewriteRule ^ropa-interior-y-de-dormir/109278$ https://ropaenavellaneda.com.ar/categoria/ropa-interior-y-de-dormir/109278 [R=302,L]
+RewriteRule ^ropa-interior/3110$ https://ropaenavellaneda.com.ar/categoria/ropa-interior/3110 [R=302,L]
+RewriteRule ^ropa-y-calzado-para-bebes/1455$ https://ropaenavellaneda.com.ar/categoria/ropa-y-calzado-para-bebes/1455 [R=302,L]
+RewriteRule ^sandalias-y-ojotas/416005$ https://ropaenavellaneda.com.ar/categoria/sandalias-y-ojotas/416005 [R=302,L]
+RewriteRule ^saquitos-sweaters-y-chalecos/109081$ https://ropaenavellaneda.com.ar/categoria/saquitos-sweaters-y-chalecos/109081 [R=302,L]
+RewriteRule ^saquitos-y-sweaters/39996$ https://ropaenavellaneda.com.ar/categoria/saquitos-y-sweaters/39996 [R=302,L]
+RewriteRule ^sets-de-carteras/455760$ https://ropaenavellaneda.com.ar/categoria/sets-de-carteras/455760 [R=302,L]
+RewriteRule ^shorts/417372$ https://ropaenavellaneda.com.ar/categoria/shorts/417372 [R=302,L]
+RewriteRule ^stilletos-y-plataformas/415194$ https://ropaenavellaneda.com.ar/categoria/stilletos-y-plataformas/415194 [R=302,L]
+RewriteRule ^tapabocas-reutilizables/445787$ https://ropaenavellaneda.com.ar/categoria/tapabocas-reutilizables/445787 [R=302,L]
+RewriteRule ^tiradores/95474$ https://ropaenavellaneda.com.ar/categoria/tiradores/95474 [R=302,L]
+RewriteRule ^toallas-de-playa/446854$ https://ropaenavellaneda.com.ar/categoria/toallas-de-playa/446854 [R=302,L]
+RewriteRule ^tobilleras/417387$ https://ropaenavellaneda.com.ar/categoria/tobilleras/417387 [R=302,L]
+RewriteRule ^tops/417376$ https://ropaenavellaneda.com.ar/categoria/tops/417376 [R=302,L]
+RewriteRule ^traba-corbatas/416198$ https://ropaenavellaneda.com.ar/categoria/traba-corbatas/416198 [R=302,L]
+RewriteRule ^trajes-de-bano/39979$ https://ropaenavellaneda.com.ar/categoria/trajes-de-bano/39979 [R=302,L]
+RewriteRule ^trajes-de-bano/430281$ https://ropaenavellaneda.com.ar/categoria/trajes-de-bano/430281 [R=302,L]
+RewriteRule ^trajes/109089$ https://ropaenavellaneda.com.ar/categoria/trajes/109089 [R=302,L]
+RewriteRule ^uniformes-escolares/95507$ https://ropaenavellaneda.com.ar/categoria/uniformes-escolares/95507 [R=302,L]
+RewriteRule ^uniformes-y-ropa-de-trabajo/417943$ https://ropaenavellaneda.com.ar/categoria/uniformes-y-ropa-de-trabajo/417943 [R=302,L]
+RewriteRule ^vestidos/373770$ https://ropaenavellaneda.com.ar/categoria/vestidos/373770 [R=302,L]
+RewriteRule ^vestidos/39976$ https://ropaenavellaneda.com.ar/categoria/vestidos/39976 [R=302,L]
+RewriteRule ^vestidos/417828$ https://ropaenavellaneda.com.ar/categoria/vestidos/417828 [R=302,L]
+RewriteRule ^zapatillas/109027 https://ropaenavellaneda.com.ar/categoria/zapatillas/109027 [R=302,L]
+
+
+# Configuración de cache del navegador
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType text/css "access plus 1 month"
+</IfModule>
+
+
+
+# Configuración de compresión de imágenes
+<IfModule mod_filter.c>
+    AddOutputFilterByType DEFLATE image/jpeg image/jpg image/png image/gif
+</IfModule>
+
+# Configuración de PHP (cPanel-generated)
+<IfModule php8_module>
+   php_flag display_errors Off
+   php_value max_execution_time 30
+   php_value max_input_time 60
+   php_value max_input_vars 10000
+   php_value memory_limit 512M
+   php_value post_max_size 1024M
+   php_value session.gc_maxlifetime 7200
+   php_value session.save_path "/var/cpanel/php/sessions/ea-php82"
+   php_value upload_max_filesize 1024M
+   php_flag zlib.output_compression On
+</IfModule>
+<IfModule lsapi_module>
+   php_flag display_errors Off
+   php_value max_execution_time 30
+   php_value max_input_time 60
+   php_value max_input_vars 10000
+   php_value memory_limit 512M
+   php_value post_max_size 1024M
+   php_value session.gc_maxlifetime 7200
+   php_value session.save_path "/var/cpanel/php/sessions/ea-php82"
+   php_value upload_max_filesize 1024M
+   php_flag zlib.output_compression On
+</IfModule>
+
+# Desactivar la indexación de directorios
+Options -Indexes
+
+# Configuración del manejador PHP para cPanel
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php82 .php .php8 .phtml
+</IfModule>
+
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Set the “ea-php82” package as the default “PHP” programming language.
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php82 .php .php8 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit
+
+# BEGIN cPanel-generated php ini directives, do not edit
+# Manual editing of this file may result in unexpected behavior.
+# To make changes to this file, use the cPanel MultiPHP INI Editor (Home >> Software >> MultiPHP INI Editor)
+# For more information, read our documentation (https://go.cpanel.net/EA4ModifyINI)
+<IfModule php8_module>
+   php_flag display_errors Off
+   php_value max_execution_time 30
+   php_value max_input_time 60
+   php_value max_input_vars 10000
+   php_value memory_limit 512M
+   php_value post_max_size 1024M
+   php_value session.gc_maxlifetime 3600
+   php_value session.save_path "/var/cpanel/php/sessions/ea-php82"
+   php_value upload_max_filesize 1024M
+   php_flag zlib.output_compression Off
+</IfModule>
+<IfModule lsapi_module>
+   php_flag display_errors Off
+   php_value max_execution_time 30
+   php_value max_input_time 60
+   php_value max_input_vars 10000
+   php_value memory_limit 512M
+   php_value post_max_size 1024M
+   php_value session.gc_maxlifetime 3600
+   php_value session.save_path "/var/cpanel/php/sessions/ea-php82"
+   php_value upload_max_filesize 1024M
+   php_flag zlib.output_compression Off
+</IfModule>
+# END cPanel-generated php ini directives, do not edit
